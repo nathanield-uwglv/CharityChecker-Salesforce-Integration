@@ -1,4 +1,4 @@
-apex-guidestar
+apex-CandidCharityChecker
 ==============
 
 Salesforce.com Apex integration with the [Candid's Charity Checker API](https://developer.candid.org/) - supports single, bulk or pdf charity check for [Candid's extensive database](http://www.candid.org/) of US nonprofit organizations.
@@ -27,9 +27,3 @@ Usage:
 
 
 The package includes a custom setting where you can store your API credentials. This way, you won't have to pass them in when you initialize the api class. For better security, use API keys rather than username and password.
-
-You can install the package into a Salesforce instance using the following URL:
-  [https://githubsfdeploy.herokuapp.com/?owner=SalesforceFoundation&repo=apex-guidestar](https://githubsfdeploy.herokuapp.com/?owner=SalesforceFoundation&repo=apex-guidestar)
-
-
-Comments and contributions are welcome!
