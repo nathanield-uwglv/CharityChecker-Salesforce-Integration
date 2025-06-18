@@ -27,3 +27,5 @@ Usage:
 
 
 The package includes a custom setting where you can store your API credentials. This way, you won't have to pass them in when you initialize the api class. For better security, use API keys rather than username and password.
+
+Repo based off of [SalesforceFoundation](https://github.com/SalesforceFoundation)'s [Apex-Guidestar](https://github.com/SalesforceFoundation/apex-guidestar) and reuses lots of code from it.
