@@ -111,11 +111,6 @@ CandidCharityDetailsAction.getCharityDetails(inputs);
   - `API_Password__c` - Legacy field (deprecated)
 - **Security**: Hierarchy custom setting allows org-wide, profile, or user-specific configuration
 
-#### `.env` - Local Development (Not in VCS)
-- **Purpose**: Local API key storage for development and testing
-- **Security**: Excluded from version control via `.gitignore`
-- **Contents**: Primary and secondary API keys for development use
-
 ## Setup Instructions
 
 1. **Install the Package**: Deploy all classes and the custom object to your Salesforce org
