@@ -1,6 +1,15 @@
 @isTest
 public class CandidCharityTest {
     
+    @testSetup
+    static void setup() {
+        // Create test custom settings
+        CandidCharity_Settings__c settings = new CandidCharity_Settings__c();
+        settings.Name = 'Default';
+        settings.Charity_Check_API_Key__c = 'test-api-key';
+        insert settings;
+    }
+    
     // Updated JSON response matching the new API structure
     public static final String charityCheckJson = '{\"data\":{\"organization_id\":\"7794876\",\"organization_info_last_modified\":\"11/21/2024 4:10:31 PM\",\"ein\":\"53-0242652\",\"organization_name\":\"The Nature Conservancy\",\"organization_name_aka\":\"The Nature Conservancy\",\"address_line1\":\"4245 N Fairfax Dr\",\"address_line2\":\"Ste 100\",\"city\":\"Arlington\",\"state\":\"VA\",\"state_name\":\"Virginia\",\"zip\":\"22203\",\"filing_req_code\":\"010\",\"charity_check_last_modified\":\"9/11/2024 5:11:41 PM\",\"pub78_church_message\":null,\"pub78_organization_name\":\"Nature Conservancy\",\"pub78_ein\":\"53-0242652\",\"pub78_verified\":\"True\",\"pub78_city\":\"Arlington\",\"pub78_state\":\"VA\",\"pub78_indicator\":\"0\",\"organization_types\":[{\"organization_type\":\"A public charity (50% deductibility limitation).\",\"deductibility_limitation\":\"50%\",\"deductibility_status_description\":\"PC\"}],\"most_recent_pub78\":\"11/11/2024 12:00:00 AM\",\"most_recent_irb\":\"12/2/2024 12:00:00 AM\",\"bmf_church_message\":null,\"bmf_organization_name\":\"NATURE CONSERVANCY\",\"bmf_ein\":\"53-0242652\",\"bmf_status\":\"True\",\"most_recent_bmf\":\"11/11/2024 12:00:00 AM\",\"bmf_subsection\":\"03\",\"subsection_description\":\"501(c)(3) Public Charity\",\"foundation_code\":\"15\",\"foundation_code_description\":\"Organization which receives a substantial part of its support from a governmental unit or the general public\",\"ruling_month\":\"03\",\"ruling_year\":\"1954\",\"adv_ruling_month\":\"00\",\"adv_ruling_year\":\"0000\",\"group_exemption\":\"0000\",\"exempt_status_code\":\"01\",\"ofac_status\":\"This organization was not included in the Office of Foreign Assets Control Specially Designated Nationals(SDN) list.\",\"revocation_code\":\"\",\"revocation_date\":\"\",\"reinstatement_date\":\"\",\"irs_bmf_pub78_conflict\":\"False\",\"foundation_509a_status\":\"Section 509(a)(1) organization as referred to in Section 170(b)(1)(A)(vi)\",\"irb_organization_id\":\"\",\"bulletin_number\":\"\",\"bulletin_url\":\"\",\"effective_date\":\"\",\"irb_last_modified\":\"\",\"report_date\":\"12/4/2024 4:36:09 PM\",\"foundation_type_code\":\"PC\",\"foundation_type_description\":\"Public charity described in section 509(a)(1) or (2)\",\"parent_organizations\":[],\"retrieval_time_in_milliseconds\":\"3.4816\",\"total_pipeline_time_in_milliseconds\":\"10.2069\"}}';
     
@@ -9,7 +18,7 @@ public class CandidCharityTest {
     private static testmethod void testCharityChecksingle() {
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         test.startTest();
-        CandidCharity cc = new CandidCharity('test@example.com','password');
+        CandidCharity cc = new CandidCharity();
         CandidCharity.CharityCheckData result = cc.charityCheck('53-0242652', 'single');
         test.stopTest();
         
@@ -22,7 +31,7 @@ public class CandidCharityTest {
     }    private static testmethod void testCharityCheckWithApiKey() {
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         test.startTest();
-        CandidCharity cc = new CandidCharity('test-api-key');
+        CandidCharity cc = new CandidCharity();
         CandidCharity.CharityCheckData result = cc.charityCheck('53-0242652', 'single');
         test.stopTest();
         
@@ -33,15 +42,17 @@ public class CandidCharityTest {
         test.startTest();
         CandidCharity cc = new CandidCharity();
         String[] einList = new String[]{'53-0242652', '12-3456789'};
-        CandidCharity.CharityCheckBulkData result = cc.charityCheck(einList, 'bulk');
+        // Corrected method call to match the signature in CandidCharity.cls
+        CandidCharity.CharityCheckBulkData result = cc.charityCheck(einList);
         test.stopTest();
         
         System.assertNotEquals(null, result);
-        // Bulk response would need different handling - this is simplified for testing
+        // Verify that the bulk response contains the correct number of organizations
+        System.assertEquals(2, result.getOrganizations().size(), 'Bulk check should return two organizations.');
     }    private static testmethod void testCharityCheckBadEin() {
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         test.startTest();
-        CandidCharity cc = new CandidCharity('test@example.com','password');
+        CandidCharity cc = new CandidCharity();
         CandidCharity.charityCheckException cce;
         try {
             CandidCharity.CharityCheckData result = cc.charityCheck('bogus123', 'single');

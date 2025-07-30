@@ -7,28 +7,16 @@ global virtual with sharing class CandidCharity {
   
   protected CandidCharity_Settings__c settings = CandidCharity_Settings__c.getInstance();
   protected String baseEndpoint = 'https://api.candid.org/charitycheck';
-  public String userId { protected get; set; }
-  public String password { protected get; set; }
-  // public String searchApiKey { protected get; set; }
   public String charityCheckApiKey { protected get; set; }
-  // public String detailApiKey { protected get; set; }
   
   /**
-   ** Constructors - you can provide the auth credentials or look them up from custom settings
+   ** Constructors - you can provide the API key or look it up from custom settings
    **/
-  public CandidCharity(String uid, String pwd) {
-    userId = uid;
-    password = pwd;
-  }
-  public CandidCharity( String cchkKey ) {
-    CandidCharityApiKey = cchkKey;
+  public CandidCharity(String apiKey) {
+    charityCheckApiKey = apiKey;
   }
   public CandidCharity() {
-    userId = settings.API_User_Id__c;
-    password = settings.API_Password__c;
-    // searchApiKey = settings.Search_API_Key__c;
     charityCheckApiKey = settings.Charity_Check_API_Key__c;
-    // detailApiKey = settings.Detail_API_Key__c;
   }
   
   
@@ -194,7 +182,7 @@ global virtual with sharing class CandidCharity {
     }
     
     // Clean all EINs
-    String[] cleanedEins = new String[]{};
+    List<String> cleanedEins = new List<String>();
     for (String ein : einList) {
       cleanedEins.add(cleanEin(ein));
     }
@@ -232,17 +220,13 @@ global virtual with sharing class CandidCharity {
   
   protected String callSingleCheck( String endpoint, String apiKey ) {
     
-    // if an API key is provided, send that - otherwise username and password
-    String authString = (apiKey != null) ? (apiKey + ':') : (userId + ':' + password);
-    
-    String authorizationHeader = 'Basic ' +
-      String.valueOf(EncodingUtil.base64Encode(Blob.valueOf(authString)));
+    String subscriptionKey = (apiKey != null) ? apiKey : charityCheckApiKey;
     
     HttpRequest http = new HttpRequest();
     http.setEndpoint(endpoint);
     http.setMethod('GET');
-    http.setHeader('Authorization', authorizationHeader);
-    // http.setHeader('Accept', 'application/json'); not needed for GET requests
+    http.setHeader('Accept', 'application/json');
+    http.setHeader('Subscription-Key', subscriptionKey);
     
     String response;
     Integer statusCode;
@@ -279,17 +263,13 @@ global virtual with sharing class CandidCharity {
   
   protected String callPDFCheck( String endpoint, String apiKey ) {
     
-    // if an API key is provided, send that - otherwise username and password
-    String authString = (apiKey != null) ? (apiKey + ':') : (userId + ':' + password);
-    
-    String authorizationHeader = 'Basic ' +
-      String.valueOf(EncodingUtil.base64Encode(Blob.valueOf(authString)));
+    String subscriptionKey = (apiKey != null) ? apiKey : charityCheckApiKey;
     
     HttpRequest http = new HttpRequest();
     http.setEndpoint(endpoint);
     http.setMethod('GET');
-    http.setHeader('Authorization', authorizationHeader);
-    http.setHeader('Accept', 'application/pdf'); // NEEDED for PDF requests
+    http.setHeader('Accept', 'application/pdf');
+    http.setHeader('Subscription-Key', subscriptionKey);
     
     Http con = new Http();
     HttpResponse hs = con.send(http);
@@ -319,28 +299,23 @@ global virtual with sharing class CandidCharity {
     }
   }
   
-  protected String callBulkCheck( String endpoint, String apiKey, String[] einList ) {
+  protected String callBulkCheck( String endpoint, String apiKey, List<String> einList ) {
     
-    String jsonBody = JSON.stringify(einList);
+    String jsonBody = JSON.serialize(einList);
     
-    
-    // if an API key is provided, send that - otherwise username and password
-    String authString = (apiKey != null) ? (apiKey + ':') : (userId + ':' + password);
-    
-    String authorizationHeader = 'Basic ' +
-      String.valueOf(EncodingUtil.base64Encode(Blob.valueOf(authString)));
+    String subscriptionKey = (apiKey != null) ? apiKey : charityCheckApiKey;
     
     HttpRequest http = new HttpRequest();
     http.setEndpoint(endpoint);
     http.setMethod('POST');
-    http.setHeader('Authorization', authorizationHeader);
     http.setHeader('Content-Type', 'application/json');
     http.setHeader('Accept', 'application/json');
+    http.setHeader('Subscription-Key', subscriptionKey);
     http.setBody(jsonBody);
     
     Integer statusCode;
     Http con = new Http();
-    HttpResponse hs = con.send(http);;
+    HttpResponse hs = con.send(http);
     
     if (hs.getStatusCode() == 200) {
       return hs.getBody();
