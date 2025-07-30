@@ -5,14 +5,6 @@ Salesforce.com Apex integration with the [Candid's Charity Checker API](https://
 
 Read all about the Candid API at [developer.candid.org](https://developer.candid.org/reference/welcome). 
 
-## Recent Updates (2025)
-
-- **Modernized Authentication**: Removed deprecated username/password authentication in favor of API key-only authentication using `Subscription-Key` header
-- **Enhanced Flow Integration**: Added two new Invocable Apex classes for seamless Salesforce Flow integration
-- **Improved Error Handling**: Better exception handling and user-friendly error messages
-- **Bulk Operations**: Enhanced bulk charity check functionality with improved data structures
-- **Security**: Added `.env` file support for local API key management (excluded from version control)
-
 ## Core Functionality
 
 ### Basic API Usage
